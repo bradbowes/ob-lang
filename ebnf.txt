@@ -11,7 +11,8 @@ type-id     = qual-id
 var-dec     = 'var' id '=' expr.
 type-dec    = 'type' id '=' type-spec.
 type-spec   = qual-id | record-spec | array-spec | enum-spec.
-record-spec = '{' [ field-spec { ',' field-spec } '}'.
+record-spec = [ ':' record-base ] '{' [ field-spec { ',' field-spec } '}'.
+record-base = qual-id
 field-spec  = id ':' qual-id.
 array-spec  = 'array' 'of' type-id.
 enum-spec   = '(' id { '|' id } ')'.
@@ -21,18 +22,14 @@ l-value     = id { subscript | field }
 if-expr     = 'if' expr 'then' expr 'else' expr.
 case-expr   = 'case' expr 'of' case-clause { '|' case-clause } [ 'else' expr ] 'end'
 let-expr    = 'let' { decl } 'in' expr.
-sequence    = 'begin expr { [ ';' ] expr } 'end'.
+sequence    = 'begin' expr { [ ';' ] expr } 'end'.
 unit        = '(' ')'.
-disjunction = conjunction
-            | disjunction 'or' conjuction.
-conjunction = compare
-            | conjunction 'and' compare.
+disjunction = conjunction { 'or' conjuction }.
+conjunction = compare { 'and' compare }.
 compare     = sum [ ( '=' | '<' | '<=' | '>' | '>=' | '<>' ) sum ].
-sum         = product
-            | sum ( '+' | '-' ) product.
-product     = unary
-            | product ( '/' | '*' | 'mod' ) unary.
-unary       = [ '-' ] factor.
+sum         = product { ( '+' | '-' ) product }.
+product     = negation { ( '/' | '*' | 'mod' ) negation }.
+negation    = [ '-' ] factor.
 factor      = id { selector } | number | string | '(' expr ')' | record | array.
 selector    = subscript | field | args.
 subscript   = '[' expr { ',' expr } ']'.
