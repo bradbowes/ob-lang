@@ -3,12 +3,14 @@ imports     = { 'import' qual-id { ',' qual-id } }.
 qual-id     = id { '.' id }.
 decs        = { [ 'export' ] decl }.
 decl        = fun-dec | var-dec | type-dec
-fun-dec     = 'function' id sig '=' expr.
+fun-dec     = 'function' id sig '=' expr
+            | 'external' 'function' id sig.
 sig         = '(' [ param { ',' param } ] ')' [ ':' type-id ].
-param       = id ':' type-id.
+param       = [ 'var' ] id ':' type-id.
 type-id     = qual-id
             | 'array' 'of' type-id.
-var-dec     = 'var' id '=' expr.
+var-dec     = 'var' id [ ':' type-id ] '=' expr
+            | 'external' 'var' id ':' type-id.
 type-dec    = 'type' id '=' type-spec.
 type-spec   = qual-id | record-spec | array-spec | enum-spec.
 record-spec = [ ':' record-base ] '{' [ field-spec { ',' field-spec } '}'.
