@@ -1,50 +1,59 @@
-module      = imports decs [ sequence ].
-imports     = { 'import' qual-id { ',' qual-id } }.
-qual-id     = id { '.' id }.
-decs        = { [ 'export' ] decl }.
-decl        = fun-dec | var-dec | type-dec
-fun-dec     = 'function' id sig '=' expr
-            | 'external' 'function' id sig.
-sig         = '(' [ param { ',' param } ] ')' [ ':' type-id ].
-param       = [ 'var' ] id ':' type-id.
-type-id     = qual-id
-            | 'array' 'of' type-id.
-var-dec     = 'var' id [ ':' type-id ] '=' expr
-            | 'external' 'var' id ':' type-id.
-type-dec    = 'type' id '=' type-spec.
-type-spec   = qual-id | record-spec | array-spec | enum-spec.
-record-spec = [ ':' record-base ] '{' [ field-spec { ',' field-spec } '}'.
-record-base = qual-id
-field-spec  = id ':' qual-id.
-array-spec  = 'array' 'of' type-id.
-enum-spec   = '(' id { '|' id } ')'.
-expr        = assignment | if-expr | case-expr | let-expr | sequence | unit | disjunction.
-assignment  = l-value ':=' expr.
-l-value     = id { subscript | field }
-if-expr     = 'if' expr 'then' expr 'else' expr.
-case-expr   = 'case' expr 'of' case-clause { '|' case-clause } [ 'else' expr ] 'end'
-let-expr    = 'let' { decl } 'in' expr.
-sequence    = 'begin' expr { [ ';' ] expr } 'end'.
-unit        = '(' ')'.
-disjunction = conjunction { 'or' conjuction }.
-conjunction = compare { 'and' compare }.
-compare     = sum [ ( '=' | '<' | '<=' | '>' | '>=' | '<>' ) sum ].
-sum         = product { ( '+' | '-' ) product }.
-product     = negation { ( '/' | '*' | 'mod' ) negation }.
-negation    = [ '-' ] factor.
-factor      = id { selector } | number | string | '(' expr ')' | record | array.
-selector    = subscript | field | args.
-subscript   = '[' expr { ',' expr } ']'.
-field       = '.' id.
-args        = '(' [ expr { ',' expr } ] ')'.
-string      = '"' { string-char } '"'.
-record      = qual-id '{' [ field-def { ',' field-def } ] '}'.
-array       = '[' [ expr { ',' expr } ] ']'.
-id          = alpha { alphanum }.
-alpha       = 'a' .. 'z' | 'A' .. 'Z' | '_'.
-digit       = '0' .. '9'.
-alphanum    = alpha | digit.
-number      = digit { digit }.
+module       = imports decs [ sequence ].
+imports      = { 'import' qual-id { ',' qual-id } }.
+qual-id      = id { '.' id }.
+decs         = { [ 'export' ] decl }.
+decl         = fun-dec | var-dec | type-dec
+fun-dec      = 'function' id sig '=' expr
+             | 'external' 'function' id sig.
+sig          = '(' [ param { ',' param } ] ')' [ ':' type-id ].
+param        = [ 'var' ] id ':' type-id.
+type-id      = qual-id
+             | 'array' 'of' type-id.
+var-dec      = 'var' id [ ':' type-id ] '=' expr
+             | 'external' 'var' id ':' type-id.
+type-dec     = 'type' id '=' type-spec.
+type-spec    = qual-id | record-spec | union-spec | array-spec | enum-spec.
+record-spec  = '{' [ field-spec { ',' field-spec } '}'.
+field-spec   = id ':' qual-id.
+union-spec   = variant-spec { '|' variant-spec }.
+variant-spec = id record-spec.
+array-spec   = 'array' 'of' type-id.
+enum-spec    = '(' id { '|' id } ')'.
+expr         = assignment | if-expr | case-expr | let-expr | for-loop
+             | while-loop | sequence | unit | disjunction.
+assignment   = l-value ':=' expr.
+l-value      = id { subscript | field }
+if-expr      = 'if' expr 'then' expr 'else' expr.
+case-expr    = 'case' expr 'of' case-clause { '|' case-clause } [ 'else' expr ] 'end'
+let-expr     = 'let' { decl } 'in' expr.
+for-loop     = 'for' id ':=' expr 'to' expr 'do' expr.
+while-loop   = 'while' expr 'do' expr.
+sequence     = 'begin' expr { [ ';' ] expr } 'end'.
+unit         = '(' ')'.
+disjunction  = conjunction { 'or' conjuction }.
+conjunction  = compare { 'and' compare }.
+compare      = sum [ ( '=' | '<' | '<=' | '>' | '>=' | '<>' ) sum ].
+sum          = product { ( '+' | '-' ) product }.
+product      = negation { ( '/' | '*' | 'mod' ) negation }.
+negation     = [ '-' ] factor.
+factor       = id { selector } | number | string | char | byte
+             | '(' expr ')' | record | array.
+selector     = subscript | field | args.
+subscript    = '[' expr { ',' expr } ']'.
+field        = '.' id.
+args         = '(' [ expr { ',' expr } ] ')'.
+string       = '"' { string-char } '"'.
+char         = '\'' string-char '\''.
+byte         = '$' hex-digit hex-digit.
+record       = qual-id '{' [ field-def { ',' field-def } ] '}'.
+array        = '[' [ expr { ',' expr } ] ']'
+             | 'array' '[' expr { ',' expr } ']' of expr.
+id           = alpha { alphanum }.
+alpha        = 'a' .. 'z' | 'A' .. 'Z' | '_'.
+digit        = '0' .. '9'.
+hex-digit    = digit | 'a' .. 'f' | 'A' .. 'F'
+alphanum     = alpha | digit.
+number       = digit { digit }.
 
-(* whitespace is ignored, id and number can't have embedded spaces *)
+(* whitespace is ignored, id, number, char and byte can't have extra embedded spaces *)
 (* string-char = any character except '"'. c style escape sequences allowed *)
