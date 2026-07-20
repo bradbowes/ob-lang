@@ -12,20 +12,22 @@ type-id      = qual-id
 var-dec      = 'var' id [ ':' type-id ] '=' expr
              | 'external' 'var' id ':' type-id.
 type-dec     = 'type' id '=' type-spec.
-type-spec    = qual-id | record-spec | union-spec | array-spec | enum-spec.
+type-spec    = qual-id | record-spec | union-spec | array-spec | enum-spec | fun-spec.
 record-spec  = '{' [ field-spec { ',' field-spec } '}'.
 field-spec   = id ':' qual-id.
 union-spec   = variant-spec { '|' variant-spec }.
 variant-spec = id record-spec.
 array-spec   = 'array' 'of' type-id.
-enum-spec    = '(' id { '|' id } ')'.
-expr         = assignment | if-expr | case-expr | let-expr | for-loop
+enum-spec    = id { '|' id }.
+fun-spec     = '(' [ qual-id { ',' qual-id } ] ')' [ '->' qual-id ]. 
+expr         = assignment | if-expr | case-expr | let-expr | lambda-expr | for-loop
              | while-loop | sequence | unit | disjunction.
 assignment   = l-value ':=' expr.
 l-value      = id { subscript | field }
 if-expr      = 'if' expr 'then' expr 'else' expr.
 case-expr    = 'case' expr 'of' case-clause { '|' case-clause } [ 'else' expr ] 'end'
 let-expr     = 'let' { decl } 'in' expr.
+lambda-expr  = 'lambda' sig '=' expr.
 for-loop     = 'for' id ':=' expr 'to' expr 'do' expr.
 while-loop   = 'while' expr 'do' expr.
 sequence     = 'begin' expr { [ ';' ] expr } 'end'.
@@ -46,6 +48,7 @@ string       = '"' { string-char } '"'.
 char         = '\'' string-char '\''.
 byte         = '$' hex-digit hex-digit.
 record       = qual-id '{' [ field-def { ',' field-def } ] '}'.
+field-def    = id '=' expr.
 array        = '[' [ expr { ',' expr } ] ']'
              | 'array' '[' expr { ',' expr } ']' of expr.
 id           = alpha { alphanum }.
